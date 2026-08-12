@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  username  String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  books     Book[]
+
+  @@map("categories")
+}
+
+model Book {
+  id              Int       @id @default(autoincrement())
+  categoryId      Int?      @map("category_id")
+  title           String
+  author          String
+  publisher       String?
+  publicationYear Int?      @map("publication_year")
+  isbn            String?   @unique
+  stock           Int       @default(0)
+  coverUrl        String?   @map("cover_url")
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("books")
+}
